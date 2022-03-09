@@ -26,21 +26,21 @@ class Dataset_custom(Dataset):
 def make_same_len(batch):
     
     each_len_list = [len(sample) for sample in batch]
-    print('each_len_list', each_len_list)
-    
     max_len = max(each_len_list)
     
     padded_batch = []
     pad_id = 0
-    
+    special_token = 0    
+
     for sample in batch:
-        padded_batch.append(sample + [pad_id] * (max_len - len(sample)))
+        padded_batch.append([special_token] + sample + [pad_id] * (max_len - len(sample)) + [special_token])
     
     return padded_batch
 
-def collate_fn_custom(batch):
-    padded_batch = make_same_len(batch)
+def collate_fn_custom(data):
+    inputs = [sample[0] for sample in data]
+    labels = [sample[2] for sample in data]
+    padded_inputs = torch.nn.utils.rnn.pad_sequence(inputs, batch_first = True)
     
-    padded_batch = torch.tensor(padded_batch)
-    
-    return padded_batch
+    return {'input': padded_inputs.contiguous(),
+            'label': torch.stack(labels).contiguous()}
