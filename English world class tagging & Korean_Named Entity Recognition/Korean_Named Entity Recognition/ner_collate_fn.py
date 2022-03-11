@@ -23,18 +23,20 @@ class Dataset_custom(Dataset):
     def __getitem__(self, idx):
         return self.x[idx]
 
+
+convert_to = []
+
 def make_same_len(batch):
-    
     each_len_list = [len(sample) for sample in batch]
     max_len = max(each_len_list)
     
     padded_batch = []
     pad_id = 0
-    special_token = 0    
+    special_token = 'PAD'
 
     for sample in batch:
-        padded_batch.append([special_token] + sample + [pad_id] * (max_len - len(sample)) + [special_token])
-    
+        padded_batch.append(['PAD'] + sample+ [pad_id] * (max_len - len(sample)) + ['PAD'])
+
     return padded_batch
 
 def collate_fn_custom(data):
